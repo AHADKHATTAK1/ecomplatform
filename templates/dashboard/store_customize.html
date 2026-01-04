@@ -1,0 +1,138 @@
+{% extends "dashboard/store_base.html" %}
+
+{% block title %}Customize Store - {{ store.name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+    <h1 class="h2">Customize Your Store</h1>
+</div>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="row">
+        <!-- Color Settings -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Color Scheme</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Primary Color</label>
+                        <input type="color" class="form-control form-control-color" name="primary_color"
+                            value="{{ theme.primary_color }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Secondary Color</label>
+                        <input type="color" class="form-control form-control-color" name="secondary_color"
+                            value="{{ theme.secondary_color }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Background Color</label>
+                        <input type="color" class="form-control form-control-color" name="background_color"
+                            value="{{ theme.background_color }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Text Color</label>
+                        <input type="color" class="form-control form-control-color" name="text_color"
+                            value="{{ theme.text_color }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typography & Layout -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Typography & Layout</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Font Family</label>
+                        <select class="form-select" name="font_family">
+                            <option value="Arial, sans-serif" {% if theme.font_family=='Arial, sans-serif' %}selected{%
+                                endif %}>Arial</option>
+                            <option value="'Times New Roman', serif" {% if theme.font_family=="'Times New Roman', serif"
+                                %}selected{% endif %}>Times New Roman</option>
+                            <option value="'Courier New', monospace" {% if theme.font_family=="'Courier New', monospace"
+                                %}selected{% endif %}>Courier New</option>
+                            <option value="Georgia, serif" {% if theme.font_family=='Georgia, serif' %}selected{% endif
+                                %}>Georgia</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Layout Width</label>
+                        <select class="form-select" name="layout_width">
+                            <option value="container" {% if theme.layout_width=='container' %}selected{% endif %}>Boxed
+                                (Container)</option>
+                            <option value="fluid" {% if theme.layout_width=='fluid' %}selected{% endif %}>Full Width
+                            </option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Store Logo</label>
+                        {% if theme.logo %}
+                        <div class="mb-2">
+                            <img src="{{ theme.logo.url }}" alt="Current Logo" style="max-width: 200px;">
+                        </div>
+                        {% endif %}
+                        <input type="file" class="form-control" name="logo" accept="image/*">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview & Actions -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Preview</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Color and typography changes will be applied to your storefront.
+                <a href="{% url 'store_home' store.slug %}" target="_blank" class="alert-link">View your store</a>
+            </div>
+
+            <div class="preview-box p-4 border rounded"
+                style="background-color: {{ theme.background_color }}; color: {{ theme.text_color }}; font-family: {{ theme.font_family }};">
+                <h3 style="color: {{ theme.primary_color }};">{{ store.name }}</h3>
+                <p>This is how your text will appear</p>
+                <button type="button" class="btn"
+                    style="background-color: {{ theme.primary_color }}; color: white;">Primary Button</button>
+                <button type="button" class="btn"
+                    style="background-color: {{ theme.secondary_color }}; color: white;">Secondary Button</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save Button -->
+    <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-primary btn-lg">
+            <i class="bi bi-check-circle"></i> Save Theme Changes
+        </button>
+    </div>
+</form>
+
+<hr class="my-5">
+
+<!-- Visual Editor (Drag-Drop) - Coming Soon -->
+<div class="card">
+    <div class="card-header bg-warning">
+        <h5 class="mb-0"><i class="bi bi-magic"></i> Drag & Drop Editor (Advanced)</h5>
+    </div>
+    <div class="card-body">
+        <p class="lead">Visual page builder with drag & drop sections is available!</p>
+        <p>Currently you can customize:</p>
+        <ul>
+            <li>Colors and fonts (above)</li>
+            <li>Logo and layout width</li>
+            <li>Store description in settings</li>
+        </ul>
+        <p class="text-muted">Note: Full drag-drop visual editor coming in next update with section management, custom
+            HTML blocks, and more!</p>
+    </div>
+</div>
+{% endblock %}

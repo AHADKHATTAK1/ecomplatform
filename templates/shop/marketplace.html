@@ -1,0 +1,43 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Marketplace - Create Your Store{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4">Welcome to the Marketplace</h1>
+        <p class="lead">Discover amazing stores or create your own</p>
+        <a href="{% url 'create_store' %}" class="btn btn-primary btn-lg">Create Your Store</a>
+        <a href="{% url 'my_stores' %}" class="btn btn-outline-secondary btn-lg">My Stores</a>
+    </div>
+
+    <h2 class="mb-4">Featured Stores</h2>
+    <div class="row">
+        {% for store in stores %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ store.name }}</h5>
+                    <p class="card-text">{{ store.description|truncatewords:20|default:"No description available" }}</p>
+                    <p class="text-muted small">
+                        {% if store.domain %}
+                        <i class="bi bi-globe"></i> {{ store.domain }}
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'store_home' store.slug %}" class="btn btn-primary w-100">Visit Store</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h4>No stores yet!</h4>
+                <p>Be the first to create a store and start selling.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

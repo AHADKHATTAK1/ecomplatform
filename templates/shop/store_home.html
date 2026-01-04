@@ -1,0 +1,66 @@
+{% extends "shop/base.html" %}
+
+{% block title %}{{ store.name }} - Store Homepage{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Store Header -->
+    <div class="jumbotron bg-light p-5 rounded mb-4">
+        <h1 class="display-4">{{ store.name }}</h1>
+        <p class="lead">{{ store.description|default:"Welcome to our store!" }}</p>
+        <hr class="my-4">
+        <p class="mb-0">
+            <a href="{% url 'store_product_list' store.slug %}" class="btn btn-primary btn-lg">Browse Products</a>
+        </p>
+    </div>
+
+    <!-- Featured Products -->
+    <h2 class="mb-4">Featured Products</h2>
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                {% else %}
+                <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center"
+                    style="height: 200px;">
+                    No Image
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">{{ product.description|truncatewords:10 }}</p>
+                    <p class="h5 text-primary">${{ product.price }}</p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'store_product_detail' store.slug product.slug %}"
+                        class="btn btn-sm btn-primary w-100">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                This store doesn't have any products yet. Check back soon!
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Categories -->
+    {% if categories %}
+    <div class="mt-5">
+        <h3>Shop by Category</h3>
+        <div class="d-flex gap-2 flex-wrap">
+            {% for category in categories %}
+            <a href="{% url 'store_product_list' store.slug %}?category={{ category.slug }}"
+                class="btn btn-outline-primary">
+                {{ category.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

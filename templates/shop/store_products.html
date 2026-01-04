@@ -1,0 +1,81 @@
+{% extends "shop/base.html" %}
+
+{% block title %}{{ store.name }} - Products{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Store Header -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'marketplace_home' %}">Marketplace</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'store_home' store.slug %}">{{ store.name }}</a></li>
+            <li class="breadcrumb-item active">Products</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4">{{ store.name }} - Products</h1>
+
+    <!-- Categories Filter -->
+    {% if categories %}
+    <div class="mb-4">
+        <h5>Categories:</h5>
+        <div class="btn-group" role="group">
+            <a href="{% url 'store_product_list' store.slug %}"
+                class="btn btn-outline-primary {% if not current_category %}active{% endif %}">
+                All
+            </a>
+            {% for category in categories %}
+            <a href="{% url 'store_product_list' store.slug %}?category={{ category.slug }}"
+                class="btn btn-outline-primary {% if current_category == category.slug %}active{% endif %}">
+                {{ category.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Products Grid -->
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
+                    style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center"
+                    style="height: 200px;">
+                    <span>No Image</span>
+                </div>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <h6 class="card-title">{{ product.name }}</h6>
+                    <p class="card-text small text-muted flex-grow-1">{{ product.description|truncatewords:8 }}</p>
+                    <div class="mt-auto">
+                        <p class="h5 text-primary mb-2">${{ product.price }}</p>
+                        {% if product.stock > 0 %}
+                        <span class="badge bg-success">In Stock</span>
+                        {% else %}
+                        <span class="badge bg-danger">Out of Stock</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'store_product_detail' store.slug product.slug %}"
+                        class="btn btn-sm btn-primary w-100">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h4>No products found</h4>
+                <p>This store doesn't have any products in this category yet.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "shop/base.html" %}
+
+{% block title %}Edit Store - {{ store.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Edit Store: {{ store.name }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Store Name *</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ store.name }}"
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description"
+                                rows="4">{{ store.description }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="domain" class="form-label">Custom Domain (Optional)</label>
+                            <input type="text" class="form-control" id="domain" name="domain"
+                                value="{{ store.domain|default:'' }}" placeholder="e.g., mystore.com">
+                            <small class="form-text text-muted">
+                                Leave blank to use default store URL (/store/{{ store.slug }}/)
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" disabled checked>
+                                <label class="form-check-label text-muted">
+                                    Store URL: /store/{{ store.slug }}/
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Save Changes</button>
+                            <a href="{% url 'my_stores' %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

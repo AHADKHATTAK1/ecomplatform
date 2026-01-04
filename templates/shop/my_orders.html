@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - Shop{% endblock %}
+
+{% block extra_css %}
+<style>
+    .orders-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .orders-header h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .order-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .order-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+        border-color: var(--primary);
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .order-id {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .order-status {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .status-pending {
+        background: rgba(245, 158, 11, 0.2);
+        color: var(--warning);
+    }
+
+    .status-processing {
+        background: rgba(99, 102, 241, 0.2);
+        color: var(--primary);
+    }
+
+    .status-shipped,
+    .status-delivered {
+        background: rgba(16, 185, 129, 0.2);
+        color: var(--success);
+    }
+
+    .order-items {
+        margin-bottom: 1rem;
+    }
+
+    .order-item {
+        padding: 0.75rem 0;
+        display: flex;
+        justify-content: space-between;
+        color: var(--text-muted);
+    }
+
+    .order-total {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .order-total .amount {
+        color: var(--primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="orders-header">
+    <h1><i class="fas fa-box"></i> My Orders</h1>
+    <p style="color: var(--text-muted); font-size: 1.1rem;">Track your purchases</p>
+</div>
+
+{% if orders %}
+{% for order in orders %}
+<div class="order-card">
+    <div class="order-header">
+        <div>
+            <div class="order-id">Order #{{ order.id }}</div>
+            <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem;">
+                {{ order.created_at|date:"F d, Y" }}
+            </div>
+        </div>
+        <div class="order-status status-{{ order.status }}">
+            {{ order.get_status_display }}
+        </div>
+    </div>
+
+    <div class="order-items">
+        {% for item in order.items.all %}
+        <div class="order-item">
+            <span>{{ item.product.name }} x{{ item.quantity }}</span>
+            <span>${{ item.price }}</span>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="order-total">
+        <span>Total</span>
+        <span class="amount">${{ order.total_amount }}</span>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div style="text-align: center; padding: 3rem; background: rgba(255, 255, 255, 0.05); border-radius: 16px;">
+    <i class="fas fa-box-open" style="font-size: 4rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+    <h2 style="color: var(--text); margin-bottom: 0.5rem;">No Orders Yet</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">Start shopping to see your orders here</p>
+    <a href="{% url 'product_list' %}" class="btn btn-primary">
+        <i class="fas fa-shopping-bag"></i> Start Shopping
+    </a>
+</div>
+{% endif %}
+{% endblock %}

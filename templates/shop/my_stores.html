@@ -1,0 +1,72 @@
+{% extends "shop/base.html" %}
+
+{% block title %}My Stores{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>My Stores</h2>
+        <a href="{% url 'create_store' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create New Store
+        </a>
+    </div>
+
+    {% if stores %}
+    <div class="row">
+        {% for store in stores %}
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="card-title mb-0">{{ store.name }}</h5>
+                        <span class="badge {% if store.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                            {% if store.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </div>
+
+                    <p class="card-text text-muted">{{ store.description|truncatewords:15|default:"No description" }}
+                    </p>
+
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <strong>URL:</strong>
+                            <a href="{% url 'store_home' store.slug %}" target="_blank">
+                                /store/{{ store.slug }}/
+                            </a>
+                        </small>
+                        {% if store.domain %}
+                        <br>
+                        <small class="text-muted">
+                            <strong>Domain:</strong> {{ store.domain }}
+                        </small>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'store_home' store.slug %}" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye"></i> View
+                        </a>
+                        <a href="{% url 'edit_store' store.slug %}" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                        <a href="/dashboard/store/{{ store.slug }}/" class="btn btn-sm btn-outline-success">
+                            <i class="bi bi-gear"></i> Manage
+                        </a>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent text-muted small">
+                    Created {{ store.created_at|date:"M d, Y" }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <h4>You don't have any stores yet</h4>
+        <p>Create your first store to start selling products online!</p>
+        <a href="{% url 'create_store' %}" class="btn btn-primary">Create First Store</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

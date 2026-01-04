@@ -1,0 +1,331 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Dashboard Home - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        animation: fadeInUp 0.8s ease;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 2rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(99, 102, 241, 0.3);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        margin-bottom: 1rem;
+    }
+
+    .stat-label {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .section {
+        margin-bottom: 3rem;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .chart-container {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .chart-wrapper {
+        height: 300px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-around;
+        gap: 1rem;
+        padding: 1rem 0;
+    }
+
+    .chart-bar {
+        flex: 1;
+        background: linear-gradient(180deg, var(--primary), var(--secondary));
+        border-radius: 8px 8px 0 0;
+        min-height: 20px;
+        position: relative;
+        transition: all 0.3s ease;
+        animation: growBar 1s ease forwards;
+    }
+
+    @keyframes growBar {
+        from {
+            height: 0;
+        }
+    }
+
+    .chart-bar:hover {
+        filter: brightness(1.2);
+        transform: translateY(-5px);
+    }
+
+    .chart-label {
+        text-align: center;
+        margin-top: 0.5rem;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+    }
+
+    .chart-value {
+        position: absolute;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: var(--text);
+        font-weight: 700;
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+    .recent-orders-table {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .status-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-pending {
+        background: rgba(245, 158, 11, 0.2);
+        color: var(--warning);
+    }
+
+    .status-processing {
+        background: rgba(99, 102, 241, 0.2);
+        color: var(--primary);
+    }
+
+    .status-shipped,
+    .status-delivered {
+        background: rgba(16, 185, 129, 0.2);
+        color: var(--success);
+    }
+
+    .low-stock-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        border-radius: 10px;
+        margin-bottom: 0.75rem;
+    }
+
+    .low-stock-item i {
+        color: var(--danger);
+        font-size: 1.5rem;
+        margin-right: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1><i class="fas fa-chart-line"></i> Dashboard</h1>
+    <p style="color: var(--text-muted); font-size: 1.1rem;">Welcome back! Here's your store overview</p>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-value">${{ total_revenue|floatformat:2 }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="stat-label">Total Orders</div>
+        <div class="stat-value">{{ total_orders }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-box"></i>
+        </div>
+        <div class="stat-label">Total Products</div>
+        <div class="stat-value">{{ total_products }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-label">Pending Orders</div>
+        <div class="stat-value">{{ pending_orders }}</div>
+    </div>
+</div>
+
+<!-- Sales Chart -->
+<div class="section">
+    <div class="section-header">
+        <h2>Sales Overview (Last 7 Days)</h2>
+    </div>
+    <div class="chart-container">
+        <div class="chart-wrapper">
+            {% for data in sales_data %}
+            <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                <div class="chart-bar"
+                    style="height: {% if data.sales > 0 %}{{ data.sales|floatformat:0 }}px{% else %}20px{% endif %};">
+                    <span class="chart-value">${{ data.sales|floatformat:0 }}</span>
+                </div>
+                <div class="chart-label">{{ data.date }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Recent Orders & Low Stock -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+    <!-- Recent Orders -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Recent Orders</h2>
+            <a href="{% url 'dashboard:orders' %}" class="btn btn-secondary">View All</a>
+        </div>
+        <div class="recent-orders-table">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td><strong>#{{ order.id }}</strong></td>
+                        <td>{{ order.user.username }}</td>
+                        <td>${{ order.total_amount }}</td>
+                        <td><span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+                        </td>
+                        <td>{{ order.created_at|date:"M d, Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 2rem;">No orders yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Low Stock Alert -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Low Stock Alert</h2>
+        </div>
+        <div class="card">
+            {% for product in low_stock_products %}
+            <div class="low-stock-item">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <div style="font-weight: 600; color: var(--text);">{{ product.name }}</div>
+                    <div style="font-size: 0.85rem; color: var(--text-muted);">Only {{ product.stock }} left</div>
+                </div>
+            </div>
+            {% empty %}
+            <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                <i class="fas fa-check-circle"
+                    style="font-size: 2rem; color: var(--success); margin-bottom: 0.5rem;"></i>
+                <p>All products in stock!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

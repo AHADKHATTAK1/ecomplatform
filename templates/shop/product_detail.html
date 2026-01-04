@@ -1,0 +1,286 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - Shop{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-detail-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        margin-bottom: 4rem;
+        animation: fadeInUp 0.8s ease;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .product-image-section {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 500px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .product-image-section::before {
+        content: '';
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        background: conic-gradient(from 0deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+        animation: rotate 10s linear infinite;
+    }
+
+    @keyframes rotate {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .product-image-section i {
+        font-size: 12rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        position: relative;
+        z-index: 1;
+    }
+
+    .product-info-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .breadcrumb {
+        display: flex;
+        gap: 0.5rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .breadcrumb a {
+        color: var(--primary);
+        text-decoration: none;
+    }
+
+    .product-category-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: rgba(99, 102, 241, 0.2);
+        color: var(--primary);
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        width: fit-content;
+    }
+
+    .product-title-detail {
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--text);
+        line-height: 1.2;
+    }
+
+    .product-price-detail {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .product-description-detail {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        line-height: 1.8;
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .stock-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid var(--success);
+        border-radius: 12px;
+        color: var(--success);
+        font-weight: 600;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .btn-large {
+        flex: 1;
+        padding: 1.25rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .related-products-section {
+        margin-top: 5rem;
+    }
+
+    .related-products-section h2 {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 2rem;
+        color: var(--text);
+    }
+
+    .related-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .related-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: block;
+    }
+
+    .related-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(99, 102, 241, 0.3);
+        border-color: var(--primary);
+    }
+
+    .related-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .related-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+    }
+
+    .related-price {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--primary);
+    }
+
+    @media (max-width: 968px) {
+        .product-detail-container {
+            grid-template-columns: 1fr;
+        }
+
+        .product-title-detail {
+            font-size: 2rem;
+        }
+
+        .product-price-detail {
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+    <div class="product-image-section">
+        <i
+            class="fas fa-{% if product.category.slug == 'electronics' %}laptop{% elif product.category.slug == 'fashion' %}tshirt{% elif product.category.slug == 'books' %}book{% else %}home{% endif %}"></i>
+    </div>
+
+    <div class="product-info-section">
+        <div class="breadcrumb">
+            <a href="{% url 'product_list' %}">Home</a>
+            <span>/</span>
+            <a href="?category={{ product.category.slug }}">{{ product.category.name }}</a>
+            <span>/</span>
+            <span>{{ product.name }}</span>
+        </div>
+
+        <span class="product-category-badge">{{ product.category.name }}</span>
+
+        <h1 class="product-title-detail">{{ product.name }}</h1>
+
+        <div class="product-price-detail">${{ product.price }}</div>
+
+        <div class="product-description-detail">
+            {{ product.description }}
+        </div>
+
+        <div class="stock-info">
+            <i class="fas fa-check-circle"></i>
+            <span>{{ product.stock }} items available</span>
+        </div>
+
+        <div class="action-buttons">
+            <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary btn-large">
+                <i class="fas fa-cart-plus"></i>
+                Add to Cart
+            </a>
+            <a href="{% url 'product_list' %}" class="btn btn-secondary btn-large">
+                <i class="fas fa-arrow-left"></i>
+                Back to Shop
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Related Products -->
+{% if related_products %}
+<div class="related-products-section">
+    <h2>You May Also Like</h2>
+    <div class="related-grid">
+        {% for related in related_products %}
+        <a href="{% url 'product_detail' related.slug %}" class="related-card">
+            <div class="related-icon">
+                <i
+                    class="fas fa-{% if related.category.slug == 'electronics' %}laptop{% elif related.category.slug == 'fashion' %}tshirt{% elif related.category.slug == 'books' %}book{% else %}home{% endif %}"></i>
+            </div>
+            <div class="related-title">{{ related.name }}</div>
+            <div class="related-price">${{ related.price }}</div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

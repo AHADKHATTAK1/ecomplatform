@@ -1,0 +1,180 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Manage Orders - Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .orders-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .filters {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .orders-table {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .status-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-pending {
+        background: rgba(245, 158, 11, 0.2);
+        color: var(--warning);
+    }
+
+    .status-processing {
+        background: rgba(99, 102, 241, 0.2);
+        color: var(--primary);
+    }
+
+    .status-shipped {
+        background: rgba(59, 130, 246, 0.2);
+        color: #3b82f6;
+    }
+
+    .status-delivered {
+        background: rgba(16, 185, 129, 0.2);
+        color: var(--success);
+    }
+
+    .status-cancelled {
+        background: rgba(239, 68, 68, 0.2);
+        color: var(--danger);
+    }
+
+    .status-select {
+        padding: 0.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        color: var(--text);
+        font-size: 0.875rem;
+    }
+
+    .order-details {
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 8px;
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    .order-items {
+        list-style: none;
+        padding: 0;
+        margin: 0.5rem 0;
+    }
+
+    .order-items li {
+        padding: 0.25rem 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="orders-header">
+    <div>
+        <h1><i class="fas fa-shopping-cart"></i> Manage Orders</h1>
+        <p style="color: var(--text-muted);">View and manage customer orders</p>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="filters">
+    <select onchange="window.location.href='?status='+this.value"
+        style="padding: 0.75rem 1rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: var(--text);">
+        <option value="">All Orders</option>
+        <option value="pending" {% if request.GET.status=='pending' %}selected{% endif %}>Pending</option>
+        <option value="processing" {% if request.GET.status=='processing' %}selected{% endif %}>Processing</option>
+        <option value="shipped" {% if request.GET.status=='shipped' %}selected{% endif %}>Shipped</option>
+        <option value="delivered" {% if request.GET.status=='delivered' %}selected{% endif %}>Delivered</option>
+        <option value="cancelled" {% if request.GET.status=='cancelled' %}selected{% endif %}>Cancelled</option>
+    </select>
+</div>
+
+<!-- Orders Table -->
+<div class="orders-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td><strong>#{{ order.id }}</strong></td>
+                <td>{{ order.user.username }}</td>
+                <td>
+                    <details>
+                        <summary style="cursor: pointer; color: var(--primary);">
+                            {{ order.items.count }} item{{ order.items.count|pluralize }}
+                        </summary>
+                        <ul class="order-items">
+                            {% for item in order.items.all %}
+                            <li>{{ item.product.name }} x{{ item.quantity }} - ${{ item.price }}</li>
+                            {% endfor %}
+                        </ul>
+                    </details>
+                </td>
+                <td><strong>${{ order.total_amount }}</strong></td>
+                <td>
+                    <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+                </td>
+                <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
+                <td>
+                    <form method="post" action="{% url 'dashboard:update_order_status' order.id %}" style="margin: 0;">
+                        {% csrf_token %}
+                        <select name="status" class="status-select" onchange="this.form.submit()">
+                            <option value="">Update...</option>
+                            <option value="pending" {% if order.status=='pending' %}selected{% endif %}>Pending</option>
+                            <option value="processing" {% if order.status=='processing' %}selected{% endif %}>Processing
+                            </option>
+                            <option value="shipped" {% if order.status=='shipped' %}selected{% endif %}>Shipped</option>
+                            <option value="delivered" {% if order.status=='delivered' %}selected{% endif %}>Delivered
+                            </option>
+                            <option value="cancelled" {% if order.status=='cancelled' %}selected{% endif %}>Cancelled
+                            </option>
+                        </select>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="7" style="padding: 0 1rem;">
+                    <div class="order-details">
+                        <strong>Shipping Address:</strong> {{ order.shipping_address }}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 2rem;">No orders found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
