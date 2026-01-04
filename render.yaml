@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: ecom-platform
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
+    startCommand: gunicorn myshop.wsgi:application
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        value: "*.onrender.com"
+      - key: PYTHON_VERSION
+        value: "3.11.7"
